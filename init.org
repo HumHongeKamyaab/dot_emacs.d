@@ -238,7 +238,7 @@ This is my emacs config that is made of a melting pot of multiple sources.
      (defvar apm-preferred-font-family-package "fonts-inconsolata"
        "Package to install to get `apm-preferred-font-family'.")
 
-     (defvar apm-preferred-font-height 100
+     (defvar apm-preferred-font-height 120
        "Preferred font height to use.")
 
      (defun apm-graphic-frame-init ()
@@ -468,8 +468,10 @@ This is my emacs config that is made of a melting pot of multiple sources.
   :ensure t
   :defer t
   :diminish projectile-mode
-  :bind (("C-x C-m" . projectile-compile-project)
+  :bind (([f9] . projectile-compile-project)
          ("C-x C-g" . projectile-find-file))
+  :bind-keymap
+        ("C-c p" . projectile-command-map)
   :init (progn
           (setq projectile-enable-caching t)
           (projectile-mode))
@@ -480,6 +482,10 @@ This is my emacs config that is made of a melting pot of multiple sources.
             (add-to-list 'projectile-project-root-files "AndroidManifest.xml")
             (with-eval-after-load 'ivy
               (setq projectile-completion-system 'ivy))))
+
+(use-package projectile-ripgrep
+  :ensure t
+  :commands projectile-ripgrep)
 #+END_SRC
 
 ** Programming
@@ -499,7 +505,7 @@ This is my emacs config that is made of a melting pot of multiple sources.
 ;    :config (aggressive-indent-global-mode t))
 
   (use-package compile
-    :bind ([f9] . compile)
+    ;; :bind ([f9] . compile)
     ;; automatically scroll to first error on output
     :config (setq compilation-scroll-output 'first-error))
 
@@ -521,7 +527,8 @@ This is my emacs config that is made of a melting pot of multiple sources.
     ;; turn on spell checking for strings and comments
     (flyspell-prog-mode)
     ;; highlight TODO etc in comments only
-    (fic-mode 1))
+    ;; (fic-mode 1)
+    )
 
   (use-package prog-mode
     :config (progn
@@ -844,10 +851,11 @@ This is my emacs config that is made of a melting pot of multiple sources.
   (use-package clang-format
     :ensure t
     :bind (:map c++-mode-map
-                ([f5] . clang-format-buffer))
+           ([f5] . clang-format-buffer)
+           ([S-tab] . clang-format-region))
     :config
     (setq clang-format-executable
-          (or (executable-find "clang-format-5.0")
+          (or (executable-find "clang-format-7")
               (executable-find "clang-format")))
     )
 
@@ -969,7 +977,7 @@ This is my emacs config that is made of a melting pot of multiple sources.
   (setq mode-name "🐮")
   ;; use aggressive indent
   ;; (aggressive-indent-mode 1)
-  (fic-mode 1)
+  ;; (fic-mode 1)
   ;; make imenu list each package for easy navigation - from
   ;; https://github.com/jwiegley/use-package/issues/80#issuecomment-46687774
   (when (string= buffer-file-name (expand-file-name "init.el" "~/dot_emacs.d"))
@@ -1140,7 +1148,8 @@ This is my emacs config that is made of a melting pot of multiple sources.
 (defun apm-latex-mode-setup ()
   "Tweaks and customisations for LaTeX mode."
   ;; smartparens latex support
-  (use-package smartparens-latex)
+  (use-package smartparens-latex
+     :ensure smartparens)
   ;; Enable source-correlate for Control-click forward/reverse search.
   (TeX-source-correlate-mode 1)
   ;; enable math mode in latex
@@ -1184,7 +1193,8 @@ This is my emacs config that is made of a melting pot of multiple sources.
   :config
   (progn
     (setq org-src-fontify-natively t)
-    (set-face-attribute 'org-block-background nil :background "#373844")))
+    ;(set-face-attribute 'org-block-background nil :background "#373844")
+    ))
 #+END_SRC
 
 ** Internet
@@ -1286,7 +1296,14 @@ This is my emacs config that is made of a melting pot of multiple sources.
 
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
-  :config (load-theme 'sanityinc-tomorrow-night t))
+  :config (load-theme 'sanityinc-tomorrow-night t)
+)
+
+;(use-package solarized-theme
+;  :ensure t
+;  :config (load-theme 'solarized-light t)
+;)
+
    #+END_SRC
 
 ** COMMENT Misc packages I did not know how to classify
@@ -1415,9 +1432,9 @@ This is my emacs config that is made of a melting pot of multiple sources.
                  ;; wrap workspaces like vim
                  (setq eyebrowse-wrap-around t)))
 
-     (use-package fic-mode
-       :ensure t
-       :defer t)
+     ;; (use-package fic-mode
+     ;;   :ensure t
+     ;;   :defer t)
 
      ;; (use-package fill-column-indicator
      ;;   :ensure t
