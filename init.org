@@ -121,10 +121,10 @@ This is my emacs config that is made of a melting pot of multiple sources.
      (setq package-enable-at-startup nil)
      ;; use https for both melpa and gelpa if available
      (if (gnutls-available-p)
-         (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                                  ("melpa" . "https://melpa.org/packages/")))
-       (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                                ("melpa" . "http://melpa.org/packages/"))))
+         (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+	                          ("gnu" . "https://elpa.gnu.org/packages/")))
+       (setq package-archives '(("melpa" . "http://melpa.org/packages/")
+                                ("gnu" . "http://elpa.gnu.org/packages/"))))
 
      (package-initialize)
 
@@ -213,7 +213,7 @@ This is my emacs config that is made of a melting pot of multiple sources.
        "This variable dictates where to put backups.")
 
      (setq backup-directory-alist
-           `((".*" . ,emacs-backup-directory)))
+	   `((".*" . ,emacs-backup-directory)))
 
      ;; prompt when trying to switch out of a dedicated window
      (setq switch-to-buffer-in-dedicated-window 'prompt)
@@ -225,12 +225,12 @@ This is my emacs config that is made of a melting pot of multiple sources.
      (defun apm-emoji-fontset-init ()
        "Set fontset to display emoji correctly."
        (if (eq system-type 'darwin)
-           ;; For NS/Cocoa
-           (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend)
-         ;; For Linux
-         (if (font-info "Symbola")
-             (set-fontset-font t 'symbol (font-spec :family "Symbola") nil 'prepend)
-           (alert "Symbola is not installed (ttf-ancient-fonts)"))))
+	   ;; For NS/Cocoa
+	   (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend)
+	 ;; For Linux
+	 (if (font-info "Symbola")
+	     (set-fontset-font t 'symbol (font-spec :family "Symbola") nil 'prepend)
+	   (alert "Symbola is not installed (ttf-ancient-fonts)"))))
 
      (defvar apm-preferred-font-family "Inconsolata"
        "Preferred font family to use.")
@@ -245,27 +245,26 @@ This is my emacs config that is made of a melting pot of multiple sources.
        "Initialise properties specific to graphical display."
        (interactive)
        (when (display-graphic-p)
-         (apm-emoji-fontset-init)
-         ;(spaceline-install t)
-         (setq frame-title-format '(buffer-file-name "%f" ("%b")))
-         ;; don't use gtk style tooltips so instead can use pos-tip etc
-         (custom-set-variables
-          '(x-gtk-use-system-tooltips nil))
-         (tooltip-mode -1)
-         (blink-cursor-mode -1)
-         (if (font-info apm-preferred-font-family)
-             (set-face-attribute 'default nil
-                                 :family apm-preferred-font-family
-                                 :height apm-preferred-font-height)
-           (alert (format "%s font not installed (%s)"
-                          apm-preferred-font-family
-                          apm-preferred-font-family-package)))
-         (if (font-info "FontAwesome")
-             ;; make sure to use FontAwesome for it's range in the unicode
-             ;; private use area since on Windows this doesn't happen
-             ;; automagically
-             (set-fontset-font "fontset-default" '(#xf000 . #xf8ff) "FontAwesome")
-           (alert "FontAwesome is not installed (fonts-font-awesome)."))))
+	 (apm-emoji-fontset-init)
+	 (setq frame-title-format '(buffer-file-name "%f" ("%b")))
+	 ;; don't use gtk style tooltips so instead can use pos-tip etc
+	 (custom-set-variables
+	  '(x-gtk-use-system-tooltips nil))
+	 (tooltip-mode -1)
+	 (blink-cursor-mode -1)
+	 (if (font-info apm-preferred-font-family)
+	     (set-face-attribute 'default nil
+				 :family apm-preferred-font-family
+				 :height apm-preferred-font-height)
+	   (alert (format "%s font not installed (%s)"
+			  apm-preferred-font-family
+			  apm-preferred-font-family-package)))
+	 (if (font-info "FontAwesome")
+	     ;; make sure to use FontAwesome for it's range in the unicode
+	     ;; private use area since on Windows this doesn't happen
+	     ;; automagically
+	     (set-fontset-font "fontset-default" '(#xf000 . #xf8ff) "FontAwesome")
+	   (alert "FontAwesome is not installed (fonts-font-awesome)."))))
 
      ;; make sure graphical properties get set on client frames
      (add-hook 'server-visit-hook #'apm-graphic-frame-init)
@@ -291,11 +290,11 @@ This is my emacs config that is made of a melting pot of multiple sources.
        "Like `fill-paragraph', but unfill if used twice."
        (interactive)
        (let ((fill-column
-              (if (eq last-command 'endless/fill-or-unfill)
-                  (progn (setq this-command nil)
-                         (point-max))
-                fill-column)))
-         (call-interactively #'fill-paragraph)))
+	      (if (eq last-command 'endless/fill-or-unfill)
+		  (progn (setq this-command nil)
+			 (point-max))
+		fill-column)))
+	 (call-interactively #'fill-paragraph)))
 
      (global-set-key [remap fill-paragraph] #'endless/fill-or-unfill)
 
@@ -306,7 +305,7 @@ This is my emacs config that is made of a melting pot of multiple sources.
        (visual-line-mode 1)
 
        (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
-       
+
        (visual-fill-column-mode 1)
        ;; and use adaptive-wrap to 'indent' paragraphs appropriately with visual-line-mode
        (adaptive-wrap-prefix-mode 1) 
@@ -395,6 +394,7 @@ This is my emacs config that is made of a melting pot of multiple sources.
 (use-package smex
   :ensure t
   :config (smex-initialize))
+
    #+END_SRC
 
 ** File Manager
@@ -1245,64 +1245,98 @@ This is my emacs config that is made of a melting pot of multiple sources.
 ** Appearance
    - fancy-battery
    - [[https://github.com/TheBB/spaceline][spaceline]] - Powerline theme from [[https://github.com/syl20bnr/spacemacs][Spacemacs]].
-
-
 *** Theme
    - [[https://draculatheme.com/emacs/][Dracula]] - /(dark)/ Dracula color theme
    - [[https://github.com/m00natic/anti-zenburn-theme][Anti-Zenburn]] - /(light)/
 
    #+BEGIN_SRC emacs-lisp
-(use-package fancy-battery
-  :ensure t
-  :config (fancy-battery-mode 1))
+     ;; (use-package fancy-battery
+     ;;   :ensure t
+     ;;   :config (fancy-battery-mode 1))
 
-(use-package spaceline-config           ; A beautiful mode line
-  :ensure spaceline
-  :init (setq spaceline-workspace-numbers-unicode t
-              spaceline-window-numbers-unicode t)
-  :config
-  (spaceline-compile
-   'lunaryorn
-   ;; Left side of the mode line (all the important stuff)
-   '(((buffer-modified buffer-size input-method) :face highlight-face)
-     anzu
-     '(buffer-id remote-host buffer-encoding-abbrev)
-     ((point-position line-column buffer-position hud) :separator " | ")
-     major-mode
-     process
-     (flycheck-error flycheck-warning flycheck-info)
-     (python-pyvenv :fallback python-pyenv)
-     ((which-function projectile-root) :separator " @ ")
-     ((minor-modes :separator spaceline-minor-modes-separator) :when active))
-   ;; Right segment (the unimportant stuff)
-   '((workspace-number window-number)
-     (battery :when active)
-     (version-control :when active)))
+     ;; (use-package spaceline-config           ; A beautiful mode line
+     ;;   :ensure spaceline
+     ;;   :init (setq spaceline-workspace-numbers-unicode t
+     ;;               spaceline-window-numbers-unicode t)
+     ;;   :config
+     ;;   (spaceline-compile
+     ;;    'lunaryorn
+     ;;    ;; Left side of the mode line (all the important stuff)
+     ;;    '(((buffer-modified buffer-size input-method) :face highlight-face)
+     ;;      anzu
+     ;;      '(buffer-id remote-host buffer-encoding-abbrev)
+     ;;      ((point-position line-column buffer-position hud) :separator " | ")
+     ;;      major-mode
+     ;;      process
+     ;;      (flycheck-error flycheck-warning flycheck-info)
+     ;;      (python-pyvenv :fallback python-pyenv)
+     ;;      ((which-function projectile-root) :separator " @ ")
+     ;;      ((minor-modes :separator spaceline-minor-modes-separator) :when active))
+     ;;    ;; Right segment (the unimportant stuff)
+     ;;    '((workspace-number window-number)
+     ;;      (battery :when active)
+     ;;      (version-control :when active)))
 
-  (setq-default mode-line-format '("%e" (:eval (spaceline-ml-lunaryorn)))))
+     ;;   (setq-default mode-line-format '("%e" (:eval (spaceline-ml-lunaryorn)))))
 
-(use-package powerline                  ; The work-horse of Spaceline
-  :ensure t
-  :after spaceline-config
-  :config (progn
-            (setq powerline-height (truncate (* 1.0 (frame-char-height))))
-            (setq powerline-default-separator 'utf-8)))
+     ;; (use-package powerline                  ; The work-horse of Spaceline
+     ;;   :ensure t
+     ;;   :after spaceline-config
+     ;;   :config (progn
+     ;;             (setq powerline-height (truncate (* 1.0 (frame-char-height))))
+     ;;             (setq powerline-default-separator 'utf-8)))
 
-;(use-package anti-zenburn-theme
-;  :ensure t)
+     (use-package minions
+       :ensure t
+       )
 
-(use-package dracula-theme
-  :ensure t)
+     (use-package doom-modeline
+       :ensure t
+       :after (minions)
+       :config (progn
+		 (minions-mode 1)
+		 (doom-modeline-mode 1)
 
-(use-package color-theme-sanityinc-tomorrow
-  :ensure t
-  :config (load-theme 'sanityinc-tomorrow-night t)
-)
+		 ;; How tall the mode-line should be. It's only respected in GUI.
+		 (setq doom-modeline-height 1)
+		 (set-face-attribute 'mode-line nil :height apm-preferred-font-height)
+		 (set-face-attribute 'mode-line-inactive nil :height apm-preferred-font-height)
 
-;(use-package solarized-theme
-;  :ensure t
-;  :config (load-theme 'solarized-light t)
-;)
+		 ;; How wide the mode-line bar should be. It's only respected in GUI.
+		 (setq doom-modeline-bar-width 1)
+
+		 ;; 
+		 (setq doom-modeline-buffer-file-name-style 'relative-from-project )
+            
+		 ;; Whether display mu4e notifications. It requires `mu4e-alert' package.
+		 (setq doom-modeline-mu4e nil)
+            
+		 ;; built-in `project' on 26+
+		 (setq doom-modeline-project-detection 'project)
+		 ;; or `find-in-porject' if it's installed
+		 ;; (setq doom-modeline-project-detection 'projectile)
+
+		 (setq auto-revert-check-vc-info t)
+		 )
+       )
+
+     ;; (use-package anti-zenburn-theme
+     ;;   :ensure t)
+
+     (use-package dracula-theme
+       :ensure t
+       :config (load-theme 'dracula t)
+       )
+
+     ;; (use-package color-theme-sanityinc-tomorrow
+     ;;  :ensure t
+     ;;   :config (load-theme 'sanityinc-tomorrow-night t)
+     ;; )
+
+     ;(use-package solarized-theme
+     ;  :ensure t
+     ;  :config (load-theme 'solarized-light t)
+     ;)
 
    #+END_SRC
 
@@ -1514,14 +1548,9 @@ This is my emacs config that is made of a melting pot of multiple sources.
      (use-package web-beautify
        :ensure t
        )
-   #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp exports: none
-     (provide 'init)
-     ;;; init.el ends here
 
    #+END_SRC
-
 
 #+BEGIN_SRC emacs-lisp
   (defun spawn-gdb-mpi (env_file gdb_args)
@@ -1539,3 +1568,11 @@ This is my emacs config that is made of a melting pot of multiple sources.
         (setq lst (cdr lst))))
     (gdb gdb_args))
 #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp exports: none
+     (provide 'init)
+     ;;; init.el ends here
+
+   #+END_SRC
+
+
